@@ -14,7 +14,7 @@
 
 /* 1. Define the WiFi credentials */
 #define WIFI_SSID "polopolo"
-#define WIFI_PASSWORD "qwertyytrewq"
+#define WIFI_PASSWORD "********"
 #include "DHT.h"
 
 /* 2. Define the API Key */
@@ -25,7 +25,7 @@
 
 /* 4. Define the user Email and password that alreadey registerd or added in your project */
 #define USER_EMAIL "pulusatapathy@gmail.com"
-#define USER_PASSWORD "pulu1999g."
+#define USER_PASSWORD "********"
 
 //Define Firebase Data object
 FirebaseData fbdo;

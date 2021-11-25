@@ -14,18 +14,28 @@
 
 /* 1. Define the WiFi credentials */
 #define WIFI_SSID "polopolo"
-#define WIFI_PASSWORD "********"
+#define WIFI_PASSWORD "******"
 #include "DHT.h"
 
 /* 2. Define the API Key */
-#define API_KEY "AIzaSyB25fJSi_15-W7mLPiJiXgyKorDjYwIHUI"
+#define API_KEY "**********"
 
 /* 3. Define the RTDB URL */
-#define DATABASE_URL "elated-capsule-249919.firebaseio.com/" //<databaseName>.firebaseio.com or <databaseName>.<region>.firebasedatabase.app
+#define DATABASE_URL "************************" //<databaseName>.firebaseio.com or <databaseName>.<region>.firebasedatabase.app
 
 /* 4. Define the user Email and password that alreadey registerd or added in your project */
-#define USER_EMAIL "pulusatapathy@gmail.com"
-#define USER_PASSWORD "********"
+#define USER_EMAIL "******"
+#define USER_PASSWORD "******"
+
+
+// define for 16 channel MUX 
+
+#define S0 D0                           
+#define S1 D1                           
+#define S2 D2                           
+#define S3 D3                           
+#define SIG A0                   
+
 
 //Define Firebase Data object
 FirebaseData fbdo;
@@ -50,7 +60,13 @@ void setup()
 {
 
   Serial.begin(115200);
-  dht.setup(2);
+  pinMode(S0,OUTPUT);
+  pinMode(S1,OUTPUT);
+  pinMode(S2,OUTPUT);
+  pinMode(S3,OUTPUT);
+  pinMode(SIG,OUTPUT);
+  pinMode(D5, OUTPUT);
+  dht.setup(D7);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
@@ -86,12 +102,17 @@ void setup()
 }
 
 void loop(){
+// Channel 1 (C1 pin - binary output 1,0,0,0)
+    digitalWrite(S0,HIGH); digitalWrite(S1,LOW); digitalWrite(S2,LOW); digitalWrite(S3,LOW);
+    int sensorValue= analogRead(SIG);
+    
+    
+  
   if(dlt==0){
     Firebase.deleteNode(fbdo, "/test/push");
     dlt=1;
   }
   
-  int sensorValue = analogRead(A0);
   sendDataPrevMillis = millis();
   
   if (countStatus == 0) {
@@ -107,23 +128,42 @@ void loop(){
   }
   
   if (millis()-millisBefore>15000){
+    digitalWrite(S0,LOW); digitalWrite(S1,HIGH); digitalWrite(S2,LOW); digitalWrite(S3,LOW);
+    float temp = analogRead(SIG);
+    temp=temp-25;
+    temp = temp * 0.48828125;
+    temp = temp *9 / 5;
+    temp = temp + 32;
+    if(temp>120){
+      temp=0;
+    }
+
     float humidity = dht.getHumidity();     /* Get humidity value */
     float temperature = dht.getTemperature(); /* Get temperature value */
     bpm=beat*4;
     Serial.println(beat);
     beat=0;
     Serial.println(bpm);
+
+    if(bpm>=60 && bpm<=120){
+      digitalWrite(D5,HIGH);
+    }
+    else{
+      digitalWrite(D5,LOW);
+    }
     Serial.println(millis()-millisBefore);
     FirebaseJson json;
-    json.add("time", "om");
-    json.add("pulsevalue", "om");
-    json.add("temperature", "om");
-    json.add("humidity", "om");
+    json.add("time", int(millis()*0.001));
+    json.add("pulsevalue", bpm);
+    json.add("temperature", temperature);
+    json.add("humidity", humidity);
+    json.add("body_temp", temp);
     Serial.printf("Push json... %s\n", Firebase.pushJSON(fbdo, "/test/push", json) ? "ok" : fbdo.errorReason().c_str());
     json.set("time",int(millis()*0.001));
     json.set("pulsevalue",bpm);
     json.set("temperature",temperature);
     json.set("humidity",humidity);
+    json.set("body_temp",temp);
     Serial.printf("Update json... %s\n\n", Firebase.updateNode(fbdo, String("/test/push/" + fbdo.pushName()), json) ? "ok" : fbdo.errorReason().c_str());
     millisBefore=millis();
     

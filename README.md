@@ -13,7 +13,7 @@ Patient Health care monitoring system
 
 ![alt text](https://github.com/gourangasatapathyvit/tarp/blob/main/0001.jpg)
 ![alt text](https://github.com/gourangasatapathyvit/tarp/blob/main/tarp_bb_buzzer.png)
-![alt text](![alt text](https://github.com/gourangasatapathyvit/tarp/blob/main/ph4.JPG))
+![alt text](https://github.com/gourangasatapathyvit/tarp/blob/main/ph4.JPG)
 
 ![alt text](https://github.com/gourangasatapathyvit/tarp/blob/main/ph1.JPG)
 
